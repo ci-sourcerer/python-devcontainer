@@ -3,7 +3,7 @@
 set -e
 
 if [ -d ".venv" ]; then
-    printf 'Python package already installed via Poetry\n' >&2
+    printf 'Python package already installed via Poetry.\n\nBroken environment? Try running:\n\n\trm -rf .venv .poetry && setup-environment\n' >&2
     exit 0
 fi
 

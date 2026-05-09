@@ -1,0 +1,9 @@
+#!/bin/sh
+
+package="$1"
+version="$2"
+if [ -n "$version" ]; then
+    printf '%s==%s' "$package" "$version"
+else
+    printf '%s' "$package"
+fi

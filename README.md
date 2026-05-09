@@ -1,6 +1,6 @@
 # Python Dev Container
 
-This is a Python development container configuration for Visual Studio Code's Dev Containers feature. It includes a Dockerfile and a Docker Bake file for building the container image matrix.
+This is a Python development container configuration for Visual Studio Code's Dev Containers feature. It includes a Dockerfile and a Docker Bake file for building the images. Just run `docker bake`.
 
 ## Inclusions
 
