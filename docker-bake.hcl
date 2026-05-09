@@ -46,6 +46,12 @@ variable "PIPX_VERSION" {
   default     = null
 }
 
+variable "GH_VERSION" {
+  type        = string
+  description = "The version of the GitHub CLI to install."
+  default     = null
+}
+
 target "base" {
   context = "."
   dockerfile = "Dockerfile"
