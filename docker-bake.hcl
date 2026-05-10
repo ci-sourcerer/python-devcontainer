@@ -18,38 +18,44 @@ variable "REGISTRY_NAMESPACE" {
 
 variable "POETRY_VERSION" {
   type        = string
-  description = "The version of Poetry to install."
-  default     = null
+  description = "The major version pin for Poetry."
+  default     = "2"
 }
 
 variable "POETHEPOET_VERSION" {
   type        = string
-  description = "The version of Poethepoet to install."
-  default     = null
+  description = "The major version pin for Poethepoet."
+  default     = "0"
 }
 
 variable "DUNAMAI_VERSION" {
   type        = string
-  description = "The version of Dunamai to install."
-  default     = null
+  description = "The major version pin for Dunamai."
+  default     = "1"
 }
 
 variable "POETRY_PLUGIN_EXPORT_VERSION" {
   type        = string
-  description = "The version of Poetry Plugin Export to install."
-  default     = null
+  description = "The major version pin for Poetry Plugin Export."
+  default     = "1"
 }
 
 variable "PIPX_VERSION" {
   type        = string
-  description = "The version of Pipx to install."
-  default     = null
+  description = "The major version pin for pipx."
+  default     = "1"
+}
+
+variable "TWINE_VERSION" {
+  type        = string
+  description = "The major version pin for Twine."
+  default     = "6"
 }
 
 variable "GH_VERSION" {
   type        = string
-  description = "The version of the GitHub CLI to install."
-  default     = null
+  description = "The major version pin for GitHub CLI."
+  default     = "2"
 }
 
 target "base" {
@@ -61,6 +67,8 @@ target "base" {
     DUNAMAI_VERSION              = DUNAMAI_VERSION
     POETRY_PLUGIN_EXPORT_VERSION = POETRY_PLUGIN_EXPORT_VERSION
     PIPX_VERSION                 = PIPX_VERSION
+    TWINE_VERSION                = TWINE_VERSION
+    GH_VERSION                   = GH_VERSION
   }
 }
 

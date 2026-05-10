@@ -15,4 +15,19 @@ This is a Python development container configuration for Visual Studio Code's De
 
 ### Development scripts
 
+- `[install-spec](./install-spec)`: A script to generate a `requirements.txt`-style content from a spec.
 - `[setup-environment.sh](./setup-environment.sh)`: A script to set up the development environment once the container is started and the project being worked on is cloned into the container. Installs Poetry dependencies and sets up the pre-commit hooks if any.
+
+### pipx package list
+
+The file `pipx-packages.txt` defines extra pipx-installed tools in the format `<package>`.
+
+Version build arg names are derived automatically from package names as `<UPPERCASE_PACKAGE_NAME>_VERSION`, with `-` replaced by `_`.
+
+Current entries:
+
+- `poethepoet`
+- `dunamai`
+- `twine`
+
+The corresponding build args are defined in `docker-bake.hcl` and passed into `Dockerfile`.

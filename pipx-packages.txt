@@ -1,4 +1,3 @@
-poetry
 poethepoet
 dunamai
 twine

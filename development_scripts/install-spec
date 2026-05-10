@@ -2,8 +2,33 @@
 
 package="$1"
 version="$2"
-if [ -n "$version" ]; then
-    printf '%s==%s' "$package" "$version"
-else
+
+if [ -z "$version" ]; then
     printf '%s' "$package"
+    exit 0
 fi
+
+case "$version" in
+    '>'*|'<'*|'='*|'!'*|'~'*)
+        printf '%s%s' "$package" "$version"
+        ;;
+    *'*'*)
+        printf '%s==%s' "$package" "$version"
+        ;;
+    *.*.*)
+        printf '%s==%s' "$package" "$version"
+        ;;
+    *)
+        if printf '%s' "$version" | grep -Eq '^[0-9]+$'; then
+            next_major=$((version + 1))
+            printf '%s>=%s,<%s' "$package" "$version" "$next_major"
+        elif printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+$'; then
+            major=${version%%.*}
+            minor=${version#*.}
+            next_minor=$((minor + 1))
+            printf '%s>=%s,<%s.%s' "$package" "$version" "$major" "$next_minor"
+        else
+            printf '%s==%s.*' "$package" "$version"
+        fi
+        ;;
+esac

@@ -22,11 +22,11 @@ USER vscode
 COPY development_scripts/* /usr/local/bin/
 COPY pipx-packages.txt /tmp/pipx-packages.txt
 
+ENV PIPX_VERSION=$PIPX_VERSION
 ENV POETRY_VERSION=$POETRY_VERSION
 ENV POETHEPOET_VERSION=$POETHEPOET_VERSION
 ENV DUNAMAI_VERSION=$DUNAMAI_VERSION
 ENV POETRY_PLUGIN_EXPORT_VERSION=$POETRY_PLUGIN_EXPORT_VERSION
-ENV PIPX_VERSION=$PIPX_VERSION
 ENV TWINE_VERSION=$TWINE_VERSION
 ENV GH_VERSION=$GH_VERSION
 
@@ -43,11 +43,16 @@ RUN --mount=type=cache,target=/home/vscode/.cache/pip \
     register-python-argcomplete --shell zsh pipx >/home/vscode/.zfunc/_pipx
 
 RUN --mount=type=cache,target=/home/vscode/.cache/pip \
-    while IFS= read -r package; do \
+    set -eu && \
+    pipx install "$(install-spec poetry "$POETRY_VERSION")" && \
+    while read -r package; do \
         [ -n "$package" ] || continue; \
-        varname="${(U)package}_VERSION"; \
-        varname="${varname//-/_}"; \
-        version="${(P)varname}"; \
+        case "$package" in \
+            \#*) continue ;; \
+        esac; \
+        version_arg="${(U)package}_VERSION"; \
+        version_arg="${version_arg//-/_}"; \
+        version="${(P)version_arg}"; \
         pipx install "$(install-spec "$package" "$version")"; \
     done </tmp/pipx-packages.txt && \
     pipx inject poetry "$(install-spec poetry-plugin-export "$POETRY_PLUGIN_EXPORT_VERSION")" && \
@@ -57,8 +62,19 @@ RUN --mount=type=cache,target=/home/vscode/.cache/pip \
 USER root
 
 RUN set -eu; \
-    GH_VERSION="${GH_VERSION:-$(curl -fsSL 'https://api.github.com/repos/cli/cli/releases/latest' | jq -r '.tag_name' | sed 's/^v//')}"; \
+    GH_VERSION_INPUT="${GH_VERSION:-}"; \
+    if [ -z "$GH_VERSION_INPUT" ]; then \
+        GH_VERSION="$(curl -fsSL 'https://api.github.com/repos/cli/cli/releases/latest' | jq -r '.tag_name' | sed 's/^v//')"; \
+    elif printf '%s' "$GH_VERSION_INPUT" | grep -Eq '^[0-9]+(\.[0-9]+)?$'; then \
+        GH_PREFIX="v${GH_VERSION_INPUT}."; \
+        GH_VERSION="$(curl -fsSL 'https://api.github.com/repos/cli/cli/releases?per_page=100' \
+            | jq -r --arg prefix "$GH_PREFIX" '[.[].tag_name | select(startswith($prefix))][0]' \
+            | sed 's/^v//')"; \
+        [ -n "$GH_VERSION" ] && [ "$GH_VERSION" != "null" ]; \
+    else \
+        GH_VERSION="$GH_VERSION_INPUT"; \
+    fi; \
     curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz" \
         | tar -xzf - --strip-components=2 -C /tmp --wildcards "*/bin/gh"; \
     install -Dm755 /tmp/gh /usr/local/bin/gh
-RUN rm -rf /tmp/pipx-packages.txt && /tmp/gh
+RUN rm -rf /tmp/pipx-packages.txt /tmp/gh
