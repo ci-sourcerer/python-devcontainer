@@ -81,5 +81,6 @@ target "default" {
   args = {
     PYTHON_VERSION = PYTHON_VERSION
   }
-  tags = ["${join("/", compact([REGISTRY_HOST, REGISTRY_NAMESPACE, IMAGE_NAME]))}:${PYTHON_VERSION}"]
+  tags      = ["${join("/", compact([REGISTRY_HOST, REGISTRY_NAMESPACE, IMAGE_NAME]))}:${PYTHON_VERSION}"]
+  platforms = ["linux/amd64", "linux/arm64"]
 }
