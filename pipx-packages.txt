@@ -1,3 +1,4 @@
 poethepoet
 dunamai
 twine
+pyinstaller
