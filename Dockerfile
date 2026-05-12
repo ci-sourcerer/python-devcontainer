@@ -9,6 +9,8 @@ LABEL org.opencontainers.image.authors="Joseph Asbury <ci_sourcerer@yahoo.com>"
 
 SHELL [ "/bin/zsh", "-c" ]
 
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+
 ARG PIPX_VERSION
 ARG POETRY_VERSION
 ARG POETHEPOET_VERSION
@@ -55,7 +57,6 @@ RUN --mount=type=cache,target=/home/vscode/.cache/pip \
         version="${(P)version_arg}"; \
         pipx install "$(install-spec "$package" "$version")"; \
     done </tmp/pipx-packages.txt && \
-    pipx inject poetry "$(install-spec poetry-plugin-export "$POETRY_PLUGIN_EXPORT_VERSION")" && \
     poetry completions zsh >/home/vscode/.zfunc/_poetry && \
     poe _zsh_completion >/home/vscode/.zfunc/_poe
 
