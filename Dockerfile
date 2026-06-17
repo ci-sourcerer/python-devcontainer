@@ -10,53 +10,80 @@ LABEL org.opencontainers.image.authors="Joseph Asbury <ci_sourcerer@yahoo.com>"
 SHELL [ "/bin/zsh", "-c" ]
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV PATH="/usr/local/bin:$PATH"
 
-ARG PIPX_VERSION
+ARG UV_VERSION
+ARG ARGCOMPLETE_VERSION
 ARG POETRY_VERSION
 ARG POETHEPOET_VERSION
 ARG DUNAMAI_VERSION
 ARG POETRY_PLUGIN_EXPORT_VERSION
 ARG TWINE_VERSION
+ARG PYINSTALLER_VERSION
 ARG GH_VERSION
 
 USER vscode
+
+ENV PATH=/home/vscode/.local/bin:$PATH
     
 COPY development_scripts/* /usr/local/bin/
-COPY pipx-packages.txt /tmp/pipx-packages.txt
+COPY tool-requirements.txt /tmp/tool-requirements.txt
 
-ENV PIPX_VERSION=$PIPX_VERSION
+ENV UV_VERSION=$UV_VERSION
+ENV ARGCOMPLETE_VERSION=$ARGCOMPLETE_VERSION
 ENV POETRY_VERSION=$POETRY_VERSION
 ENV POETHEPOET_VERSION=$POETHEPOET_VERSION
 ENV DUNAMAI_VERSION=$DUNAMAI_VERSION
 ENV POETRY_PLUGIN_EXPORT_VERSION=$POETRY_PLUGIN_EXPORT_VERSION
 ENV TWINE_VERSION=$TWINE_VERSION
+ENV PYINSTALLER_VERSION=$PYINSTALLER_VERSION
 ENV GH_VERSION=$GH_VERSION
 
 RUN mkdir -p /home/vscode/.zfunc && \
     printf 'fpath+=~/.zfunc\ncompinit\n' >>/home/vscode/.zshrc
 
-RUN --mount=type=cache,target=/home/vscode/.cache/pip \
+USER root
+
+ENV UV_TOOL_BIN_DIR=/home/vscode/.local/bin
+
+RUN --mount=type=cache,target=/root/.cache/pip \
     set -eu && \
     autoload -Uz compinit && \
     compinit && \
-    pip install "$(install-spec pipx "$PIPX_VERSION")" && \
-    pipx ensurepath && \
-    pipx install argcomplete && \
-    register-python-argcomplete --shell zsh pipx >/home/vscode/.zfunc/_pipx
+    UV_INSTALL="uv" && \
+    ARGCOMPLETE_INSTALL="argcomplete" && \
+    if [ -n "${UV_VERSION:-}" ]; then UV_INSTALL="uv==${UV_VERSION}"; fi && \
+    if [ -n "${ARGCOMPLETE_VERSION:-}" ]; then ARGCOMPLETE_INSTALL="argcomplete==${ARGCOMPLETE_VERSION}"; fi && \
+    pip install "$UV_INSTALL" "$ARGCOMPLETE_INSTALL"
 
-RUN --mount=type=cache,target=/home/vscode/.cache/pip \
+USER vscode
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=cache,target=/root/.cache/uv \
     set -eu && \
-    pipx install "$(install-spec poetry "$POETRY_VERSION")" && \
-    while read -r package; do \
-        [ -n "$package" ] || continue; \
-        case "$package" in \
+    while read -r requirement; do \
+        [ -n "$requirement" ] || continue; \
+        case "$requirement" in \
             \#*) continue ;; \
         esac; \
+        package="${requirement%%==*}"; \
+        default_version="${requirement#*==}"; \
+        [ "$package" != "$requirement" ] || { \
+            printf 'Invalid requirement entry: %s\\n' "$requirement" >&2; \
+            exit 1; \
+        }; \
         version_arg="${(U)package}_VERSION"; \
         version_arg="${version_arg//-/_}"; \
-        version="${(P)version_arg}"; \
-        pipx install "$(install-spec "$package" "$version")"; \
-    done </tmp/pipx-packages.txt && \
+        override_version="${(P)version_arg:-}"; \
+        version="${override_version:-$default_version}"; \
+        if printf '%s' "$version" | grep -Eq '[[:space:]><=!~]'; then \
+            printf 'Invalid exact version for %s: %s\n' "$package" "$version" >&2; \
+            exit 1; \
+        fi; \
+        uv tool install "${package}==${version}"; \
+    done </tmp/tool-requirements.txt && \
+    POETRY_PLUGIN_EXPORT_VERSION="${POETRY_PLUGIN_EXPORT_VERSION:-1.8.0}" && \
+    poetry self add "poetry-plugin-export==${POETRY_PLUGIN_EXPORT_VERSION}" && \
     poetry completions zsh >/home/vscode/.zfunc/_poetry && \
     poe _zsh_completion >/home/vscode/.zfunc/_poe
 
@@ -78,4 +105,5 @@ RUN set -eu; \
     curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz" \
         | tar -xzf - --strip-components=2 -C /tmp --wildcards "*/bin/gh"; \
     install -Dm755 /tmp/gh /usr/local/bin/gh
-RUN rm -rf /tmp/pipx-packages.txt /tmp/gh
+
+RUN rm -rf /tmp/tool-requirements.txt /tmp/gh

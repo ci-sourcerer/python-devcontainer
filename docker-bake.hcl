@@ -18,56 +18,70 @@ variable "REGISTRY_NAMESPACE" {
 
 variable "POETRY_VERSION" {
   type        = string
-  description = "The major version pin for Poetry."
-  default     = "2"
+  description = "The exact version pin for Poetry. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
 variable "POETHEPOET_VERSION" {
   type        = string
-  description = "The major version pin for Poethepoet."
-  default     = "0"
+  description = "The exact version pin for Poethepoet. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
 variable "DUNAMAI_VERSION" {
   type        = string
-  description = "The major version pin for Dunamai."
-  default     = "1"
+  description = "The exact version pin for Dunamai. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
 variable "POETRY_PLUGIN_EXPORT_VERSION" {
   type        = string
-  description = "The major version pin for Poetry Plugin Export."
-  default     = "1"
+  description = "The exact version pin for Poetry Plugin Export. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
-variable "PIPX_VERSION" {
+variable "UV_VERSION" {
   type        = string
-  description = "The major version pin for pipx."
-  default     = "1"
+  description = "The exact version pin for uv. Uses tool-requirements defaults when unset."
+  default     = null
+}
+
+variable "ARGCOMPLETE_VERSION" {
+  type        = string
+  description = "The exact version pin for argcomplete. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
 variable "TWINE_VERSION" {
   type        = string
-  description = "The major version pin for Twine."
-  default     = "6"
+  description = "The exact version pin for Twine. Uses tool-requirements defaults when unset."
+  default     = null
+}
+
+variable "PYINSTALLER_VERSION" {
+  type        = string
+  description = "The exact version pin for PyInstaller. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
 variable "GH_VERSION" {
   type        = string
-  description = "The major version pin for GitHub CLI."
-  default     = "2"
+  description = "The exact version pin for GitHub CLI. Uses tool-requirements defaults when unset."
+  default     = null
 }
 
 target "base" {
   context = "."
   dockerfile = "Dockerfile"
   args = {
+    UV_VERSION                   = UV_VERSION
+    ARGCOMPLETE_VERSION          = ARGCOMPLETE_VERSION
     POETRY_VERSION               = POETRY_VERSION
     POETHEPOET_VERSION           = POETHEPOET_VERSION
     DUNAMAI_VERSION              = DUNAMAI_VERSION
     POETRY_PLUGIN_EXPORT_VERSION = POETRY_PLUGIN_EXPORT_VERSION
-    PIPX_VERSION                 = PIPX_VERSION
     TWINE_VERSION                = TWINE_VERSION
+    PYINSTALLER_VERSION          = PYINSTALLER_VERSION
     GH_VERSION                   = GH_VERSION
   }
 }
@@ -75,7 +89,7 @@ target "base" {
 target "default" {
   inherits = ["base"]
   matrix = {
-    PYTHON_VERSION = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    PYTHON_VERSION = ["3.11", "3.12", "3.13", "3.14"]
   }
   name = "python-${replace(PYTHON_VERSION, ".", "-")}"
   args = {

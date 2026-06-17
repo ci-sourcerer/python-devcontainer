@@ -1,4 +1,0 @@
-poethepoet
-dunamai
-twine
-pyinstaller
