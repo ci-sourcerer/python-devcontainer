@@ -30,4 +30,4 @@ When an override is provided, the image installs `package==<override>`.
 
 ### Development scripts
 
-- `development_scripts/setup-environment`: A script to set up the development environment once the container is started and the project is cloned into the container. It installs Poetry dependencies and sets up pre-commit hooks when configured.
+- `development_scripts/setup-environment`: A script to set up the development environment once the container is started and the project is cloned into the container. It installs dependencies with Poetry or uv, and sets up pre-commit hooks when configured. Set `PACKAGE_MANAGER` to determistically choose between Poetry and uv for dependency management.
