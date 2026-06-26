@@ -1,6 +1,5 @@
 # Exact default versions for uv tool installs.
 # Build args with matching names can override these defaults.
-# Example: poetry -> POETRY_VERSION, poetry-plugin-export -> POETRY_PLUGIN_EXPORT_VERSION.
 
 poetry==2.1.3
 poethepoet==0.34.0

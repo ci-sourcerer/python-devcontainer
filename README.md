@@ -17,17 +17,17 @@ This is a Python development container configuration for Visual Studio Code's De
 
 ### Tool version defaults
 
-The file `tool-requirements.txt` contains exact default versions for tools installed with `uv tool`.
+[`requirements.txt`](requirements.txt) contains exact default versions for tools installed with `uv tool`.
 
 Build args in `docker-bake.hcl` can override those defaults. The mapping rule is:
 
 - `package-name` maps to `<UPPERCASE_PACKAGE_NAME>_VERSION`
 - `-` becomes `_`
 
-Example: `poethepoet` maps to `POETHEPOET_VERSION`.
+For example: `poethepoet` maps to `POETHEPOET_VERSION`.
 
 When an override is provided, the image installs `package==<override>`.
 
 ### Development scripts
 
-- `development_scripts/setup-environment`: A script to set up the development environment once the container is started and the project is cloned into the container. It installs dependencies with Poetry or uv, and sets up pre-commit hooks when configured. Set `PACKAGE_MANAGER` to determistically choose between Poetry and uv for dependency management.
+- [`development_scripts/setup-environment.sh`](development_scripts/setup-environment.sh): A script to set up the development environment once the container is started and the project is cloned into the container. It installs dependencies with Poetry or uv, and sets up pre-commit hooks when configured. Set `PACKAGE_MANAGER` to deterministically choose between Poetry and uv for dependency management.
