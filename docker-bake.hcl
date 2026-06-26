@@ -18,55 +18,55 @@ variable "REGISTRY_NAMESPACE" {
 
 variable "POETRY_VERSION" {
   type        = string
-  description = "The exact version pin for Poetry. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for Poetry. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "POETHEPOET_VERSION" {
   type        = string
-  description = "The exact version pin for Poethepoet. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for Poethepoet. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "DUNAMAI_VERSION" {
   type        = string
-  description = "The exact version pin for Dunamai. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for Dunamai. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "POETRY_PLUGIN_EXPORT_VERSION" {
   type        = string
-  description = "The exact version pin for Poetry Plugin Export. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for Poetry Plugin Export. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "UV_VERSION" {
   type        = string
-  description = "The exact version pin for uv. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for uv. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "ARGCOMPLETE_VERSION" {
   type        = string
-  description = "The exact version pin for argcomplete. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for argcomplete. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "TWINE_VERSION" {
   type        = string
-  description = "The exact version pin for Twine. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for Twine. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "PYINSTALLER_VERSION" {
   type        = string
-  description = "The exact version pin for PyInstaller. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for PyInstaller. Uses requirements.txt defaults when unset."
   default     = null
 }
 
 variable "GH_VERSION" {
   type        = string
-  description = "The exact version pin for GitHub CLI. Uses tool-requirements defaults when unset."
+  description = "The exact version pin for GitHub CLI. Uses requirements.txt defaults when unset."
   default     = null
 }
 

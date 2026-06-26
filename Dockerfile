@@ -26,8 +26,8 @@ USER vscode
 
 ENV PATH=/home/vscode/.local/bin:$PATH
     
-COPY development_scripts/* /usr/local/bin/
-COPY tool-requirements.txt /tmp/tool-requirements.txt
+COPY --link development_scripts/*.sh /usr/local/bin/
+COPY requirements.txt /tmp/requirements.txt
 
 ENV UV_VERSION=$UV_VERSION
 ENV ARGCOMPLETE_VERSION=$ARGCOMPLETE_VERSION
@@ -54,7 +54,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     ARGCOMPLETE_INSTALL="argcomplete" && \
     if [ -n "${UV_VERSION:-}" ]; then UV_INSTALL="uv==${UV_VERSION}"; fi && \
     if [ -n "${ARGCOMPLETE_VERSION:-}" ]; then ARGCOMPLETE_INSTALL="argcomplete==${ARGCOMPLETE_VERSION}"; fi && \
-    pip install "$UV_INSTALL" "$ARGCOMPLETE_INSTALL"
+    PIP_ROOT_USER_ACTION=ignore pip install "$UV_INSTALL" "$ARGCOMPLETE_INSTALL"
 
 USER vscode
 
@@ -81,7 +81,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
             exit 1; \
         fi; \
         uv tool install "${package}==${version}"; \
-    done </tmp/tool-requirements.txt && \
+    done </tmp/requirements.txt && \
     POETRY_PLUGIN_EXPORT_VERSION="${POETRY_PLUGIN_EXPORT_VERSION:-1.8.0}" && \
     poetry self add "poetry-plugin-export==${POETRY_PLUGIN_EXPORT_VERSION}" && \
     poetry completions zsh >/home/vscode/.zfunc/_poetry && \
@@ -104,6 +104,10 @@ RUN set -eu; \
     fi; \
     curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz" \
         | tar -xzf - --strip-components=2 -C /tmp --wildcards "*/bin/gh"; \
-    install -Dm755 /tmp/gh /usr/local/bin/gh
+    install -Dm755 /tmp/gh /usr/local/bin/gh \
+    && gh completion -s zsh >/usr/local/share/zsh/site-functions/_gh
 
-RUN rm -rf /tmp/tool-requirements.txt /tmp/gh
+RUN rm -rf /tmp/requirements.txt /tmp/gh
+
+WORKDIR /home/vscode
+ENTRYPOINT [ "/usr/bin/zsh" ]
