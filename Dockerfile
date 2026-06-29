@@ -40,7 +40,8 @@ ENV PYINSTALLER_VERSION=$PYINSTALLER_VERSION
 ENV GH_VERSION=$GH_VERSION
 
 RUN mkdir -p /home/vscode/.zfunc && \
-    printf 'fpath+=~/.zfunc\ncompinit\n' >>/home/vscode/.zshrc
+    printf 'fpath+=~/.zfunc\ncompinit\n' >>/home/vscode/.zshrc && \
+    printf 'export UV_CACHE_DIR="${UV_CACHE_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)/.uv-cache}"\n' >>/home/vscode/.zshrc
 
 USER root
 
