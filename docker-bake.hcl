@@ -36,19 +36,19 @@ variable "DUNAMAI_VERSION" {
 
 variable "POETRY_PLUGIN_EXPORT_VERSION" {
   type        = string
-  description = "The exact version pin for Poetry Plugin Export. Uses requirements.txt defaults when unset."
+  description = "The exact version pin for Poetry Plugin Export. Uses tool-versions.env defaults when unset."
   default     = null
 }
 
 variable "UV_VERSION" {
   type        = string
-  description = "The exact version pin for uv. Uses requirements.txt defaults when unset."
+  description = "The exact version pin for uv. Uses tool-versions.env defaults when unset."
   default     = null
 }
 
 variable "ARGCOMPLETE_VERSION" {
   type        = string
-  description = "The exact version pin for argcomplete. Uses requirements.txt defaults when unset."
+  description = "The exact version pin for argcomplete. Uses tool-versions.env defaults when unset."
   default     = null
 }
 
@@ -64,9 +64,69 @@ variable "PYINSTALLER_VERSION" {
   default     = null
 }
 
+variable "RUFF_VERSION" {
+  type        = string
+  description = "The exact version pin for Ruff. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "PRE_COMMIT_VERSION" {
+  type        = string
+  description = "The exact version pin for pre-commit. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "PIP_AUDIT_VERSION" {
+  type        = string
+  description = "The exact version pin for pip-audit. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "MYPY_VERSION" {
+  type        = string
+  description = "The exact version pin for mypy. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "PYTEST_VERSION" {
+  type        = string
+  description = "The exact version pin for pytest. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "PYTEST_COV_VERSION" {
+  type        = string
+  description = "The exact version pin for pytest-cov. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "PYTEST_XDIST_VERSION" {
+  type        = string
+  description = "The exact version pin for pytest-xdist. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "IPYTHON_VERSION" {
+  type        = string
+  description = "The exact version pin for IPython. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
+variable "DEBUGPY_VERSION" {
+  type        = string
+  description = "The exact version pin for debugpy. Uses requirements.txt defaults when unset."
+  default     = null
+}
+
 variable "GH_VERSION" {
   type        = string
-  description = "The exact version pin for GitHub CLI. Uses requirements.txt defaults when unset."
+  description = "The exact version pin for GitHub CLI. Uses tool-versions.env defaults when unset."
+  default     = null
+}
+
+variable "HADOLINT_VERSION" {
+  type        = string
+  description = "The exact version pin for hadolint. Uses tool-versions.env defaults when unset."
   default     = null
 }
 
@@ -82,7 +142,17 @@ target "base" {
     POETRY_PLUGIN_EXPORT_VERSION = POETRY_PLUGIN_EXPORT_VERSION
     TWINE_VERSION                = TWINE_VERSION
     PYINSTALLER_VERSION          = PYINSTALLER_VERSION
+    RUFF_VERSION                 = RUFF_VERSION
+    PRE_COMMIT_VERSION           = PRE_COMMIT_VERSION
+    PIP_AUDIT_VERSION            = PIP_AUDIT_VERSION
+    MYPY_VERSION                 = MYPY_VERSION
+    PYTEST_VERSION               = PYTEST_VERSION
+    PYTEST_COV_VERSION           = PYTEST_COV_VERSION
+    PYTEST_XDIST_VERSION         = PYTEST_XDIST_VERSION
+    IPYTHON_VERSION              = IPYTHON_VERSION
+    DEBUGPY_VERSION              = DEBUGPY_VERSION
     GH_VERSION                   = GH_VERSION
+    HADOLINT_VERSION             = HADOLINT_VERSION
   }
 }
 

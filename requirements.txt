@@ -1,8 +1,17 @@
 # Exact default versions for uv tool installs.
 # Build args with matching names can override these defaults.
 
-poetry==2.3.4
-poethepoet==0.34.0
-dunamai==1.25.0
-twine==6.1.0
-pyinstaller==6.11.1
+poetry==2.5.1
+poethepoet==0.49.0
+dunamai==1.26.3
+twine==7.0.0
+pyinstaller==6.22.3
+ruff==0.17.2
+pre-commit==4.7.0
+pip-audit==2.10.1
+mypy==2.4.0
+pytest==9.1.1
+pytest-cov==7.1.0
+pytest-xdist==3.8.0
+ipython==9.17.1
+debugpy==1.8.22
