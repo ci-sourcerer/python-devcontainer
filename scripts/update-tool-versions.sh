@@ -1,6 +1,15 @@
 #!/bin/sh
 set -eu
 
+if ! git diff --cached --quiet; then
+    printf 'Commit or unstage existing staged changes first.\n' >&2
+    exit 1
+fi
+if ! git diff --quiet -- requirements.txt tool-versions.env; then
+    printf 'Commit or revert existing version file changes first.\n' >&2
+    exit 1
+fi
+
 _requirements=$(mktemp ./requirements.txt.XXXXXX)
 _versions=$(mktemp ./tool-versions.env.XXXXXX)
 trap 'rm -f "$_requirements" "$_versions"' EXIT
@@ -10,6 +19,14 @@ case "${ALLOW_MAJOR_UPDATES:-0}" in
     0|1) ;;
     *) printf 'ALLOW_MAJOR_UPDATES must be 0 or 1\n' >&2; exit 1 ;;
 esac
+
+_changed=''
+
+_record_change() {
+    if [ "$2" != "$3" ]; then
+        _changed="${_changed:+$_changed, }$1"
+    fi
+}
 
 _select_version() {
     if ! printf '%s\n' "$1" | grep -Eq '^[0-9]+(\.[0-9]+)*$'; then
@@ -66,6 +83,7 @@ while IFS= read -r _line || [ -n "$_line" ]; do
             fi
             _package=${_line%%==*}
             _version=$(_pypi_version "$_package" "${_line#*==}")
+            _record_change "$_package" "${_line#*==}" "$_version"
             printf '%s==%s\n' "$_package" "$_version" >> "$_requirements"
             printf '%s: %s -> %s\n' "$_package" "${_line#*==}" "$_version"
             ;;
@@ -83,12 +101,15 @@ while IFS= read -r _line || [ -n "$_line" ]; do
     esac
     _seen="$_seen$_name "
     case "$_name" in
-        DEFAULT_UV_VERSION) _version=$(_pypi_version uv "${_line#*=}") ;;
-        DEFAULT_ARGCOMPLETE_VERSION) _version=$(_pypi_version argcomplete "${_line#*=}") ;;
+        DEFAULT_UV_VERSION) _package=uv; _version=$(_pypi_version uv "${_line#*=}") ;;
+        DEFAULT_ARGCOMPLETE_VERSION)
+            _package=argcomplete; _version=$(_pypi_version argcomplete "${_line#*=}") ;;
         DEFAULT_POETRY_PLUGIN_EXPORT_VERSION)
+            _package=poetry-plugin-export
             _version=$(_pypi_version poetry-plugin-export "${_line#*=}") ;;
-        DEFAULT_GH_VERSION) _version=$(_github_version cli/cli "${_line#*=}") ;;
-        DEFAULT_HADOLINT_VERSION) _version=$(_github_version hadolint/hadolint "${_line#*=}") ;;
+        DEFAULT_GH_VERSION) _package=gh; _version=$(_github_version cli/cli "${_line#*=}") ;;
+        DEFAULT_HADOLINT_VERSION)
+            _package=hadolint; _version=$(_github_version hadolint/hadolint "${_line#*=}") ;;
         *) printf 'Unsupported default: %s\n' "$_line" >&2; exit 1 ;;
     esac
     if ! printf '%s\n' "$_line" | grep -Eq \
@@ -96,6 +117,7 @@ while IFS= read -r _line || [ -n "$_line" ]; do
         printf 'Invalid default: %s\n' "$_line" >&2
         exit 1
     fi
+    _record_change "$_package" "${_line#*=}" "$_version"
     printf '%s=%s\n' "$_name" "$_version" >> "$_versions"
     printf '%s: %s -> %s\n' "$_name" "${_line#*=}" "$_version"
 done < tool-versions.env
@@ -109,6 +131,13 @@ for _name in DEFAULT_UV_VERSION DEFAULT_ARGCOMPLETE_VERSION \
     esac
 done
 
+if [ -z "$_changed" ]; then
+    printf 'All tool versions are up to date.\n'
+    exit 0
+fi
+
 chmod 644 "$_requirements" "$_versions"
 mv "$_requirements" requirements.txt
 mv "$_versions" tool-versions.env
+git add -- requirements.txt tool-versions.env
+git commit -m "chore(deps): update $_changed"
