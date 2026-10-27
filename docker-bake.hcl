@@ -159,7 +159,7 @@ target "base" {
 target "default" {
   inherits = ["base"]
   matrix = {
-    PYTHON_VERSION = ["3.11", "3.12", "3.13", "3.14"]
+    PYTHON_VERSION = ["3.11", "3.12", "3.13", "3.14", "3.15"]
   }
   name = "python-${replace(PYTHON_VERSION, ".", "-")}"
   args = {
